@@ -6,7 +6,7 @@
 #
 #  License :: OSI Approved :: MIT License:
 #      http://www.opensource.org/licenses/mit-license
-# 
+#
 #      Permission is hereby granted, free of charge, to any person obtaining a copy
 #      of this software and associated documentation files (the "Software"), to deal
 #      in the Software without restriction, including without limitation the rights
@@ -20,30 +20,48 @@
 
 
 """
-    mem_stat - Python Module for Memory Stats on Linux
-    
+    path - Python Module for providing configurable system paths (with defaults)
+
+
     requires:
     - Python 2.6+
     - Linux 2.6+
-    
+
 """
 
-from .path import Path
+import os
+import os.path
 
+class Path:
+    @classmethod
+    def proc_stat(cls):
+        return cls.join('/proc/stat')
 
-def mem_stats():
-    with open(Path.proc_meminfo()) as f:
-        for line in f:
-            if line.startswith('MemTotal:'):
-                mem_total = int(line.split()[1]) * 1024
-            elif line.startswith('Active: '):
-                mem_active = int(line.split()[1]) * 1024
-            elif line.startswith('MemFree:'):
-                mem_free = (int(line.split()[1]) * 1024)
-            elif line.startswith('Cached:'):
-                mem_cached = (int(line.split()[1]) * 1024)
-            elif line.startswith('SwapTotal: '):
-                swap_total = (int(line.split()[1]) * 1024)
-            elif line.startswith('SwapFree: '):
-                swap_free = (int(line.split()[1]) * 1024)
-    return (mem_active, mem_total, mem_cached, mem_free, swap_total, swap_free)
+    @classmethod
+    def proc_net_dev(cls):
+        return cls.join('/proc/net/dev')
+
+    @classmethod
+    def proc_meminfo(cls):
+        return cls.join('/proc/meminfo')
+
+    @classmethod
+    def proc_diskstats(cls):
+        return cls.join('/proc/diskstats')
+
+    @classmethod
+    def proc_stat(cls):
+        return cls.join('/proc/stat')
+
+    @classmethod
+    def proc_loadavg(cls):
+        return cls.join('/proc/loadavg')
+
+    @classmethod
+    def proc_cpuinfo(cls):
+        return cls.join('/proc/cpuinfo')
+
+    @classmethod
+    def join(cls, path):
+        root = os.environ.get('LINUX_METRICS_ROOT_FS', '/')
+        return os.path.join(root, path.lstrip('/'))

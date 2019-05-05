@@ -33,11 +33,12 @@
 import time
 from subprocess import Popen, PIPE
 
+from .path import Path
    
 def disk_busy(device, sample_duration=1):
     """Return disk busy percent."""
-    with open('/proc/diskstats') as f1:
-        with open('/proc/diskstats') as f2:
+    with open(Path.proc_diskstats()) as f1:
+        with open(Path.proc_diskstats()) as f2:
             content1 = f1.read()
             time.sleep(sample_duration)
             content2 = f2.read()
@@ -60,7 +61,7 @@ def disk_busy(device, sample_duration=1):
 
 def disk_reads_writes(device):
     """Return number of disk (reads, writes)."""
-    with open('/proc/diskstats') as f:
+    with open(Path.proc_diskstats()) as f:
         content = f.read()
     sep = '%s ' % device
     found = False
@@ -91,8 +92,8 @@ def disk_usage(path):
 
 def disk_reads_writes_persec(device, sample_duration=1):
     """Return number of disk (reads, writes) per sec during the sample_duration."""
-    with open('/proc/diskstats') as f1:
-        with open('/proc/diskstats') as f2:
+    with open(Path.proc_diskstats()) as f1:
+        with open(Path.proc_diskstats()) as f2:
             content1 = f1.read()
             time.sleep(sample_duration)
             content2 = f2.read()

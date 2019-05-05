@@ -20,6 +20,7 @@
 
 
 from . import mem_stat
+from .test_path import patch_env
 
 import unittest
 
@@ -27,6 +28,7 @@ import unittest
 class TestMemoryStats(unittest.TestCase):
     
     def setUp(self):
+        patch_env(self)
         (self.mem_active,
         self.mem_total,
         self.mem_cached,
@@ -35,22 +37,22 @@ class TestMemoryStats(unittest.TestCase):
         self.swap_free) = mem_stat.mem_stats()
 
     def test_mem_active(self):
-        self.assertTrue(self.mem_active > 0)
+        self.assertEqual(self.mem_active, 2048)
         
     def test_mem_total(self):
-        self.assertTrue(self.mem_total > 0)
+        self.assertEqual(self.mem_total, 1024)
         
     def test_mem_cached(self):
-        self.assertTrue(self.mem_cached > 0)
+        self.assertEqual(self.mem_cached, 4096)
         
     def test_mem_free(self):
-        self.assertTrue(self.mem_free > 0)
+        self.assertEqual(self.mem_free, 3072)
 
     def test_swap_total(self):
-        self.assertTrue(self.swap_total > 0)
+        self.assertEqual(self.swap_total, 5120)
 
     def test_swap_free(self):
-        self.assertTrue(self.swap_free > 0)
+        self.assertEqual(self.swap_free, 6144)
 
 
 if __name__ == '__main__':  

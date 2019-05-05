@@ -20,6 +20,7 @@
 
 
 from . import disk_stat
+from .test_path import patch_env
 
 import unittest
 
@@ -33,39 +34,40 @@ class TestDiskStats(unittest.TestCase):
     def setUp(self):
         self.device = DISK_DEVICE
         self.sample_duration = .1  # secs
+        patch_env(self)
     
     def test_disk_busy(self):
         value = disk_stat.disk_busy(
             self.device,
             self.sample_duration
         )
-        self.assertTrue(0.0 <= value <= 100.0, value)
+        self.assertEqual(value, 0.0)
         
     def test_disk_reads(self):
         value, _ = disk_stat.disk_reads_writes(
             self.device
         )
-        self.assertTrue(value >= 0, value)
+        self.assertEqual(value, 1)
     
     def test_disk_reads_persec(self):
         value, _ = disk_stat.disk_reads_writes_persec(
             self.device,
             self.sample_duration
         )
-        self.assertTrue(value >= 0.0, value)
+        self.assertEqual(value, 0.0)
         
     def test_disk_writes(self):
         _, value = disk_stat.disk_reads_writes(
             self.device
         )
-        self.assertTrue(value >= 0, value)
+        self.assertEqual(value, 5)
         
     def test_disk_writes_persec(self):
         _, value = disk_stat.disk_reads_writes_persec(
             self.device,
             self.sample_duration
         )
-        self.assertTrue(value >= 0.0, value)
+        self.assertEqual(value, 0.0)
         
     def test_invalid_disk_interface(self):
         self.assertRaises(

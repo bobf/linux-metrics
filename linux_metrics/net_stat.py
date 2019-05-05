@@ -33,11 +33,12 @@
 
 import re
 import subprocess
+from .path import Path
 
 
 
 def rx_tx_bytes(interface):  # by reading /proc
-    with open('/proc/net/dev') as f:
+    with open(Path.proc_net_dev()) as f:
         for line in f.readlines():
             if interface in line:
                 data = line.split('%s:' % interface)[1].split()
@@ -53,7 +54,7 @@ def rx_tx_bits(interface):  # by reading /proc
     return (rx_bits, tx_bits)
 
 def rx_tx_dump(interface): #get all info
-    with open('/proc/net/dev') as f:
+    with open(Path.proc_net_dev()) as f:
         for line in f.readlines():
             if interface in line:
                 data = line.split('%s:' % interface)[1].split()

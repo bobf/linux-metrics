@@ -18,42 +18,46 @@
 #      all copies or substantial portions of the Software.
 #
 
+import os
+import os.path
 
 from . import net_stat
+from .test_path import patch_env
 
 import unittest
+from unittest import mock
 
 
 # configuration
-NETWORK_INTERFACE = 'enp4s0'
+NETWORK_INTERFACE = 'eth999'
 
 
 class TestNetworkStats(unittest.TestCase):
 
     def setUp(self):
         self.interface = NETWORK_INTERFACE
+        patch_env(self)
 
     def test_rx_tx_bytes(self):
         rx, tx = net_stat.rx_tx_bytes(
             self.interface
         )
-        self.assertTrue(rx >= 0, rx)
-        self.assertTrue(tx >= 0, tx)
+        self.assertEqual(rx, 10)
+        self.assertEqual(tx, 90)
 
     def test_rx_tx_bits(self):
         rx, tx = net_stat.rx_tx_bits(
             self.interface
         )
-        self.assertTrue(rx >= 0, rx)
-        self.assertTrue(tx >= 0, tx)
+        self.assertEqual(rx, 80)
+        self.assertTrue(rx, 240)
 
     def test_rx_tx_dump(self):
-        rx, tx = net_stat.rx_tx_bits(
+        rx, tx = net_stat.rx_tx_dump(
             self.interface
         )
-        rx, tx = map(int, (rx, tx))
-        self.assertTrue(rx >= 0, rx)
-        self.assertTrue(tx >= 0, tx)
+        self.assertEqual(rx, [10, 20, 30, 40, 50, 60, 70, 80])
+        self.assertEqual(tx, [90, 100, 110])
 
     def test_invalid_net_interface(self):
         self.assertRaises(

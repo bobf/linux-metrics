@@ -32,6 +32,7 @@
 
 import time
 
+from .path import Path
 
 
 def cpu_times():
@@ -45,7 +46,7 @@ def cpu_times():
     on SMP systems, these are aggregates of all processors/cores.
     """
     
-    with open('/proc/stat') as f:
+    with open(Path.proc_stat()) as f:
         line = f.readline()
     
     cpu_times = [int(x) for x in line.split()[1:]]
@@ -66,7 +67,12 @@ def cpu_percents(sample_duration=1):
     
     deltas = __cpu_time_deltas(sample_duration)
     total = sum(deltas)
-    percents = [100 - (100 * (float(total - x) / total)) for x in deltas]
+    percents = []
+    for delta in deltas:
+        try:
+            percents.append(100 - (100 * (float(total - delta) / total)))
+        except ZeroDivisionError:
+            percents.append(None)
 
     return {
         'user': percents[0],
@@ -116,7 +122,7 @@ def file_desc():
 def load_avg():
     """Return a sequence of system load averages (1min, 5min, 15min)."""
     
-    with open('/proc/loadavg') as f:
+    with open(Path.proc_loadavg()) as f:
         line = f.readline()
     
     load_avgs = [float(x) for x in line.split()[:3]]
@@ -131,7 +137,7 @@ def cpu_info():
     of processors.
     """
     
-    with open('/proc/cpuinfo') as f:
+    with open(Path.proc_cpuinfo()) as f:
         cpuinfo = {'processor_count': 0}
         for line in f:
             if ':' in line:
@@ -160,8 +166,8 @@ def __cpu_time_deltas(sample_duration):
     on SMP systems, these are aggregates of all processors/cores.
     """
     
-    with open('/proc/stat') as f1:
-        with open('/proc/stat') as f2:
+    with open(Path.proc_stat()) as f1:
+        with open(Path.proc_stat()) as f2:
             line1 = f1.readline()
             time.sleep(sample_duration)
             line2 = f2.readline()
@@ -173,7 +179,7 @@ def __cpu_time_deltas(sample_duration):
     
     
 def __proc_stat(stat):
-    with open('/proc/stat') as f:
+    with open(Path.proc_stat()) as f:
         for line in f:
             if line.startswith(stat):
                 return int(line.split()[1])
